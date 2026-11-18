@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #050612;
+  color: #f1f7ff;
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: 'Unbounded', system-ui, -apple-system, sans-serif;
+}
+
+/* Tier 1: Floating Navigation Rails & Modals (Maximum Depth) */
+.glass-surface-tier-1 {
+  background: rgba(2, 3, 8, 0.92);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(79, 216, 255, 0.35);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.85),
+    0 0 30px rgba(79, 216, 255, 0.15);
+}
+
+/* Tier 2: Content Cards & Playgrounds (Standard Interactive Surface) */
+.glass-surface-tier-2 {
+  background: rgba(10, 20, 50, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-surface-tier-2:hover {
+  background: rgba(16, 28, 68, 0.65);
+  border-color: rgba(79, 216, 255, 0.5);
+  box-shadow: 
+    0 18px 40px rgba(0, 0, 0, 0.7),
+    0 0 25px rgba(79, 216, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Tier 3: Inner Insets, Badges & Micro-Pills (Low Elevation) */
+.glass-surface-tier-3 {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Accessible focus outlines */
+:focus-visible {
+  outline: 2px solid #4fd8ff;
+  outline-offset: 2px;
+}
+
+/* Custom Cyber Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #020308;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(79, 216, 255, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4fd8ff;
+}
+
+/* Reduced Motion Architecture */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
