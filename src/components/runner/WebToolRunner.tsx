@@ -6,10 +6,8 @@ import {
   RotateCcw,
   Upload,
   FileCheck,
-  Download,
   Lock,
   ArrowLeft,
-  Sparkles,
   FileCode2,
   Copy,
   Check,
@@ -25,7 +23,7 @@ interface WebToolRunnerProps {
 
 export const WebToolRunner: React.FC<WebToolRunnerProps> = ({ product, onBack }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'hasher' | 'crypto' | 'convert'>('hasher');
+  const [activeTab, setActiveTab] = useState<'hasher' | 'crypto'>('hasher');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [calculatedSha256, setCalculatedSha256] = useState<string | null>(null);
@@ -51,7 +49,6 @@ export const WebToolRunner: React.FC<WebToolRunnerProps> = ({ product, onBack })
     setEncryptionStatus(null);
     setCopiedHash(false);
 
-    // Compute SHA-256 client-side using native Web Crypto API + generate hex preview
     setIsProcessing(true);
     try {
       const buffer = await file.arrayBuffer();
@@ -93,7 +90,7 @@ export const WebToolRunner: React.FC<WebToolRunnerProps> = ({ product, onBack })
     setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
-      setEncryptionStatus(`Protected with AES-GCM 256. Zero-knowledge cipher generated in memory.`);
+      setEncryptionStatus('Protected with AES-GCM 256. Zero-knowledge cipher generated in memory.');
     }, 450);
   };
 
@@ -110,7 +107,7 @@ export const WebToolRunner: React.FC<WebToolRunnerProps> = ({ product, onBack })
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="p-1.5 rounded-lg text-text-dim hover:text-white hover:bg-white/5 transition-all flex items-center gap-1 text-xs font-mono"
+            className="p-1.5 rounded-lg text-text-dim hover:text-white hover:bg-white/5 transition-all flex items-center gap-1 text-xs font-mono cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
@@ -142,7 +139,7 @@ export const WebToolRunner: React.FC<WebToolRunnerProps> = ({ product, onBack })
               setEncryptionStatus(null);
               soundEngine.playSnapHolo();
             }}
-            className="p-2 rounded-lg bg-white/5 text-text-dim hover:text-white transition-all"
+            className="p-2 rounded-lg bg-white/5 text-text-dim hover:text-white transition-all cursor-pointer"
             title="Reset Workspace"
           >
             <RotateCcw className="w-4 h-4" />
@@ -150,7 +147,7 @@ export const WebToolRunner: React.FC<WebToolRunnerProps> = ({ product, onBack })
 
           <button
             onClick={() => setIsFullscreen(!isFullscreen)}
-            className="p-2 rounded-lg bg-cyan-electric/15 text-cyan-electric border border-cyan-electric/30 hover:bg-cyan-electric/25 transition-all"
+            className="p-2 rounded-lg bg-cyan-electric/15 text-cyan-electric border border-cyan-electric/30 hover:bg-cyan-electric/25 transition-all cursor-pointer"
             title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}

@@ -10,6 +10,11 @@ import {
   Share2,
   Check,
   Sparkles,
+  Terminal,
+  Copy,
+  ExternalLink,
+  Layers,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { GithubIcon } from '../components/ui/GithubIcon';
 import { Product } from '../data/catalog';
@@ -29,6 +34,8 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'downloads' | 'docs' | 'changelog'>('overview');
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedCommand, setCopiedCommand] = useState(false);
+  const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null);
 
   const latestRelease = product.releases.find((r) => r.isLatest) || product.releases[0];
 
@@ -39,13 +46,31 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
+  const getCliInstallCommand = () => {
+    if (product.type === 'web_tool') {
+      return `npx @nikneuron/${product.slug} || open https://nikneuron.dev/run/${product.slug}`;
+    } else if (product.type === 'mobile') {
+      return `adb install -r ${latestRelease?.files[0]?.fileName || 'app.apk'}`;
+    } else if (product.type === 'security_tool' || product.type === 'desktop') {
+      return `curl -sSL https://nikneuron.dev/install/${product.slug}.sh | bash`;
+    }
+    return `git clone ${product.repoUrl || 'https://github.com/Nikneuron/' + product.slug}`;
+  };
+
+  const handleCopyCommand = () => {
+    soundEngine.playTone(850, 0.04, 'triangle', 0.04);
+    navigator.clipboard.writeText(getCliInstallCommand());
+    setCopiedCommand(true);
+    setTimeout(() => setCopiedCommand(false), 2000);
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 space-y-8 animate-fadeIn">
       {/* Top Breadcrumb & Share */}
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-xs font-mono text-text-dim hover:text-white transition-colors"
+          className="flex items-center gap-2 text-xs font-mono text-text-dim hover:text-white transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Catalog</span>
@@ -53,7 +78,7 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
 
         <button
           onClick={handleShare}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-void-surface border border-white/10 text-xs font-mono text-text-secondary hover:text-white hover:border-cyan-electric/40 transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-void-surface border border-white/10 text-xs font-mono text-text-secondary hover:text-white hover:border-cyan-electric/40 transition-all cursor-pointer"
         >
           {copiedLink ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Share2 className="w-3.5 h-3.5" />}
           <span>{copiedLink ? 'Link Copied' : 'Share'}</span>
@@ -61,7 +86,7 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
       </div>
 
       {/* Hero Header Card */}
-      <div className="relative rounded-3xl glass-surface-tier-1 p-6 sm:p-10 border border-white/15 overflow-hidden">
+      <div className="relative rounded-3xl glass-surface-tier-1 p-6 sm:p-10 border border-white/15 overflow-hidden shadow-2xl">
         {/* Glow backdrop */}
         <div
           className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none"
@@ -136,13 +161,30 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => soundEngine.playTone(700, 0.04, 'sine', 0.03)}
-                className="py-3 px-6 rounded-2xl bg-void-surface border border-white/15 text-white font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:border-cyan-electric/40 transition-all"
+                className="py-3 px-6 rounded-2xl bg-void-surface border border-white/15 text-white font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:border-cyan-electric/40 transition-all cursor-pointer"
               >
                 <GithubIcon className="w-4 h-4" />
                 <span>View Repository</span>
               </a>
             )}
           </div>
+        </div>
+
+        {/* Quick CLI Execution Box for Developers */}
+        <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between gap-3 bg-black/40 -mx-6 -mb-6 sm:-mx-10 sm:-mb-10 p-4 sm:px-10 font-mono text-xs text-text-dim">
+          <div className="flex items-center gap-2 min-w-0">
+            <Terminal className="w-4 h-4 text-cyan-electric shrink-0" />
+            <span className="text-white text-[11px] truncate select-all">{getCliInstallCommand()}</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleCopyCommand}
+            className="flex items-center gap-1 text-[11px] text-cyan-electric hover:underline shrink-0 cursor-pointer"
+          >
+            {copiedCommand ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+            <span>{copiedCommand ? 'Copied' : 'Copy'}</span>
+          </button>
         </div>
       </div>
 
@@ -207,6 +249,39 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
               })}
             </div>
           </div>
+
+          {/* Screenshots Gallery */}
+          {product.screenshots.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-display font-bold text-sm text-white flex items-center gap-2">
+                <ImageIcon className="w-4 h-4 text-cyan-electric" />
+                <span>Interface Previews</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {product.screenshots.map((s, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      soundEngine.playTone(700, 0.03, 'sine', 0.03);
+                      setSelectedScreenshot(s);
+                    }}
+                    className="relative rounded-2xl overflow-hidden border border-white/15 bg-black/40 group cursor-pointer hover:border-cyan-electric/50 transition-all aspect-video"
+                  >
+                    <img
+                      src={s}
+                      alt={`${product.name} Preview ${idx + 1}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-void-deep/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="text-xs font-mono text-cyan-electric bg-black/80 px-3 py-1 rounded-lg border border-cyan-electric/40">
+                        Click to Expand
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -271,6 +346,24 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Screenshot Lightbox Modal */}
+      {selectedScreenshot && (
+        <div
+          onClick={() => setSelectedScreenshot(null)}
+          className="fixed inset-0 z-50 p-4 sm:p-10 bg-void-deep/90 backdrop-blur-md flex items-center justify-center cursor-pointer animate-fadeIn"
+        >
+          <div className="relative max-w-4xl w-full rounded-2xl overflow-hidden border border-cyan-electric/40 shadow-2xl">
+            <img src={selectedScreenshot} alt="Expanded Screenshot" className="w-full h-auto object-contain" />
+            <button
+              onClick={() => setSelectedScreenshot(null)}
+              className="absolute top-4 right-4 p-2 rounded-xl bg-black/80 text-white text-xs font-mono border border-white/20"
+            >
+              ✕ Close
+            </button>
+          </div>
         </div>
       )}
     </div>

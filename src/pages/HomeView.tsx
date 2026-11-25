@@ -181,7 +181,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
           </div>
           <button
             onClick={() => onNavigate('apps')}
-            className="text-xs font-mono text-text-dim hover:text-white transition-colors"
+            className="text-xs font-mono text-text-dim hover:text-white transition-colors cursor-pointer"
           >
             Browse Full Catalog ({INITIAL_PRODUCTS.length} tools) ↗
           </button>

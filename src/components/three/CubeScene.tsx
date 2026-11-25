@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, useEffect, useState, useCallback } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { RotateCw, ZoomIn, ZoomOut, Compass, Sparkles, Eye, RefreshCw } from 'lucide-react';
+import { RotateCw, ZoomIn, ZoomOut, RefreshCw } from 'lucide-react';
 import { useAppStore, CUBE_CATEGORIES } from '../../store/useAppStore';
 import { createFaceCanvasTexture } from './faceTextures';
 import { soundEngine } from '../../lib/audio';
@@ -96,13 +96,11 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
   const currentQuaternion = useRef(new THREE.Quaternion());
   const isSlerpingToFace = useRef(true);
 
-  // Rotational velocity for inertial flick
   const velocity = useRef({ x: 0, y: 0 });
   const lastFaceAnnounced = useRef<number>(-1);
 
   const frontFaceIndex = useAppStore((s) => s.frontFaceIndex);
 
-  // When frontFaceIndex changes externally (via Rail or 1-6 keys), animate back to that face
   useEffect(() => {
     const euler = FACE_EULERS[frontFaceIndex] || [0, 0, 0];
     const e = new THREE.Euler(euler[0], euler[1], euler[2], 'XYZ');
@@ -111,7 +109,6 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
     velocity.current = { x: 0, y: 0 };
   }, [frontFaceIndex]);
 
-  // Layer 2: Plasma Shader Material Uniforms
   const plasmaUniforms = useMemo(
     () => ({
       uTime: { value: 0 },
@@ -122,7 +119,6 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
     []
   );
 
-  // Layer 4: 6 Outer Canvas Textures
   const materials = useMemo(() => {
     return [0, 1, 2, 3, 4, 5].map((idx) => {
       const texture = createFaceCanvasTexture(idx);
@@ -135,13 +131,11 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
     });
   }, []);
 
-  // Layer 5: Edges
   const edgesGeometry = useMemo(() => {
     const boxGeo = new THREE.BoxGeometry(2.404, 2.404, 2.404);
     return new THREE.EdgesGeometry(boxGeo);
   }, []);
 
-  // Helper: Find which face is currently pointing most towards the camera (+Z)
   const calculateFrontFacingIndex = useCallback(() => {
     let maxDot = -Infinity;
     let closestIndex = 0;
@@ -159,16 +153,13 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
     return closestIndex;
   }, []);
 
-  // Frame Loop
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // Animate plasma shader
     if (plasmaMeshRef.current) {
       plasmaUniforms.uTime.value = time;
     }
 
-    // Animate inner hot-pink cyber lattice
     if (latticeMeshRef.current) {
       latticeMeshRef.current.rotation.y = time * 0.4;
       latticeMeshRef.current.rotation.z = time * 0.25;
@@ -176,19 +167,14 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
 
     if (!groupRef.current) return;
 
-    // Floating bob
     groupRef.current.position.y = Math.sin(time * 1.5) * 0.08;
-
-    // Camera zoom interpolation
     state.camera.position.z = THREE.MathUtils.lerp(state.camera.position.z, zoomLevel, 0.1);
 
     if (isDragging) {
-      // User is actively moving the cube with mouse/cursor
       isSlerpingToFace.current = false;
       const dx = pointerDelta.current.dx;
       const dy = pointerDelta.current.dy;
 
-      // Trackball virtual sphere rotation
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist > 0.001) {
         const sensitivity = 0.007;
@@ -196,10 +182,8 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
         const deltaQ = new THREE.Quaternion().setFromAxisAngle(axis, dist * sensitivity);
         currentQuaternion.current.premultiply(deltaQ);
 
-        // Store velocity for release inertia
         velocity.current = { x: dx * 0.5, y: dy * 0.5 };
 
-        // Telemetry update
         const currentFront = calculateFrontFacingIndex();
         if (currentFront !== lastFaceAnnounced.current) {
           lastFaceAnnounced.current = currentFront;
@@ -211,7 +195,6 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
       pointerDelta.current = { dx: 0, dy: 0 };
       groupRef.current.quaternion.copy(currentQuaternion.current);
     } else if (autoOrbit) {
-      // Continuous slow cinematic spin
       isSlerpingToFace.current = false;
       const deltaQ = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), delta * 0.4);
       currentQuaternion.current.premultiply(deltaQ);
@@ -223,7 +206,6 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
         onFrontFaceChange(currentFront);
       }
     } else {
-      // Apply rotational inertia
       const speed = Math.sqrt(
         velocity.current.x * velocity.current.x + velocity.current.y * velocity.current.y
       );
@@ -248,7 +230,6 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
         currentQuaternion.current.slerp(targetQuaternion.current, alpha);
         groupRef.current.quaternion.copy(currentQuaternion.current);
       } else {
-        // Free float: Apply subtle cursor parallax tilt
         const targetTiltX = pointerPos.current.y * 0.12;
         const targetTiltY = pointerPos.current.x * 0.12;
 
@@ -257,7 +238,6 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
       }
     }
 
-    // Report Azimuth / Elevation Euler degrees for HUD telemetry
     const euler = new THREE.Euler().setFromQuaternion(currentQuaternion.current);
     onRotationAnglesChange(
       Math.round(THREE.MathUtils.radToDeg(euler.y)),
@@ -274,7 +254,6 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
 
   return (
     <group ref={groupRef} position={[0, 0, 0]}>
-      {/* Layer 2: Volumetric GLSL Plasma Core */}
       <mesh ref={plasmaMeshRef}>
         <boxGeometry args={[1.7, 1.7, 1.7]} />
         <shaderMaterial
@@ -286,7 +265,6 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
         />
       </mesh>
 
-      {/* Layer 3: Core Cyber Lattice (Icosahedron Wireframe in Hot Pink) */}
       <mesh ref={latticeMeshRef}>
         <icosahedronGeometry args={[1.1, 1]} />
         <meshBasicMaterial
@@ -298,12 +276,10 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
         />
       </mesh>
 
-      {/* Layer 4: Outer Translucent Glass Shell (6-Material Box) */}
       <mesh material={materials} onPointerDown={handlePointerDown}>
         <boxGeometry args={[2.4, 2.4, 2.4]} />
       </mesh>
 
-      {/* Layer 5: Neon Wire Edges */}
       <lineSegments geometry={edgesGeometry}>
         <lineBasicMaterial
           color="#4fd8ff"
@@ -316,7 +292,6 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
   );
 };
 
-// Layer 1: Space Halo Billboard Disc
 const SpaceHalo: React.FC = () => {
   const haloTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
@@ -370,14 +345,12 @@ export const CubeScene: React.FC<{ className?: string }> = ({ className = '' }) 
 
   const currentCategory = CUBE_CATEGORIES[facingIndex] || CUBE_CATEGORIES[frontFaceIndex];
 
-  // Mouse & Touch Drag Handlers
   const handlePointerDown = (e: React.PointerEvent) => {
     setIsDragging(true);
     hasInteracted.current = true;
     dragDistance.current = 0;
     lastMousePos.current = { x: e.clientX, y: e.clientY };
     soundEngine.playTone(500, 0.03, 'sine', 0.03);
-
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   };
 
@@ -406,14 +379,12 @@ export const CubeScene: React.FC<{ className?: string }> = ({ className = '' }) 
     setIsDragging(false);
     (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
 
-    // If drag was very small, treat as a face cycle tap
     if (dragDistance.current < 6) {
       soundEngine.playSnapHolo();
       rotateToFace((frontFaceIndex + 1) % 6);
     }
   };
 
-  // Wheel Zoom
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
     setZoomLevel((prev) => {
@@ -493,7 +464,7 @@ export const CubeScene: React.FC<{ className?: string }> = ({ className = '' }) 
         </span>
       </div>
 
-      {/* Top-Right Telemetry HUD (Coordinates & Current Face) */}
+      {/* Top-Right Telemetry HUD */}
       <div className="absolute top-4 right-4 pointer-events-none hidden sm:flex flex-col items-end gap-1 font-mono text-[10px] text-text-dim bg-void-surface/70 border border-white/10 px-3 py-1.5 rounded-xl backdrop-blur-md">
         <div className="flex items-center gap-1.5">
           <span className="text-white font-bold">NODE:</span>
@@ -506,7 +477,7 @@ export const CubeScene: React.FC<{ className?: string }> = ({ className = '' }) 
         </div>
       </div>
 
-      {/* Viewport Control Bar (Bottom-Right Floating Dock) */}
+      {/* Viewport Control Bar */}
       <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 bg-void-surface/90 border border-white/15 p-1 rounded-2xl backdrop-blur-xl shadow-lg">
         <button
           type="button"
@@ -549,7 +520,7 @@ export const CubeScene: React.FC<{ className?: string }> = ({ className = '' }) 
         </button>
       </div>
 
-      {/* Corner Cyber Calipers (Holographic Reticles) */}
+      {/* Corner Cyber Calipers */}
       <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-cyan-electric/30 pointer-events-none" />
       <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-cyan-electric/30 pointer-events-none" />
       <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-cyan-electric/30 pointer-events-none" />
