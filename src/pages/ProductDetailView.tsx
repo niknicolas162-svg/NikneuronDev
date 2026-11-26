@@ -155,6 +155,24 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
               </button>
             )}
 
+            {(() => {
+              const latestRelease = product.releases.find((r) => r.isLatest) || product.releases[0];
+              const downloadFile = latestRelease?.files.find((f) => f.fileUrl && !f.fileUrl.startsWith('#'));
+              if (!downloadFile) return null;
+              return (
+                <a
+                  href={downloadFile.fileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => soundEngine.playLaserShoot()}
+                  className="py-3 px-6 rounded-2xl bg-pink-accent/20 border border-pink-accent/60 text-pink-accent font-display font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-pink-accent/30 hover:shadow-pink-glow transition-all cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download App</span>
+                </a>
+              );
+            })()}
+
             {product.repoUrl && (
               <a
                 href={product.repoUrl}

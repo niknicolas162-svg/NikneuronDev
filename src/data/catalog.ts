@@ -92,7 +92,7 @@ FileCore is an ultra-fast, entirely client-side suite for inspecting, converting
             id: 'file-fc-web',
             platform: 'web',
             fileName: 'filecore-v2.1.0-web.zip',
-            fileUrl: '#run-filecore',
+            fileUrl: 'https://drive.google.com/file/d/1PvPa4nsFliZBSJtLl7R1u0h2tmcIBBT1/view?usp=sharing',
             sizeBytes: 4210400,
             sha256: '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
             downloadCount: 1420,
