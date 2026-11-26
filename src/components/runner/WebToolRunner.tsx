@@ -12,6 +12,7 @@ import {
   Copy,
   Check,
   Binary,
+  Download,
 } from 'lucide-react';
 import { Product } from '../../data/catalog';
 import { soundEngine } from '../../lib/audio';
@@ -131,6 +132,25 @@ export const WebToolRunner: React.FC<WebToolRunnerProps> = ({ product, onBack })
 
         {/* Right Controls */}
         <div className="flex items-center gap-2">
+          {(() => {
+            const latestRelease = product.releases.find((r) => r.isLatest) || product.releases[0];
+            const downloadFile = latestRelease?.files.find((f) => f.fileUrl && !f.fileUrl.startsWith('#'));
+            if (!downloadFile) return null;
+            return (
+              <a
+                href={downloadFile.fileUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => soundEngine.playLaserShoot()}
+                className="px-3 py-1.5 rounded-lg bg-pink-accent/15 border border-pink-accent/50 text-pink-accent hover:bg-pink-accent/25 transition-all flex items-center gap-1.5 text-xs font-display font-semibold uppercase tracking-wider"
+                title={`Download ${product.name}`}
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download App</span>
+              </a>
+            );
+          })()}
+
           <button
             onClick={() => {
               setSelectedFile(null);

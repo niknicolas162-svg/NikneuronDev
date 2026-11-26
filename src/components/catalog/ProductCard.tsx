@@ -28,6 +28,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const Icon = iconComponentMap[product.icon] || Terminal;
   const latestRelease = product.releases.find((r) => r.isLatest) || product.releases[0];
+  const downloadFile = latestRelease?.files.find((f) => f.fileUrl && !f.fileUrl.startsWith('#'));
 
   return (
     <GradientSkewCard
@@ -97,18 +98,37 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Action Buttons */}
       <div className="flex items-center gap-2 pt-3 border-t border-white/10 mt-auto">
         {product.runnerRoute ? (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              soundEngine.playLaserShoot();
-              if (onLaunch) onLaunch(product);
-            }}
-            className="flex-1 py-2 px-3 rounded-xl bg-cyan-electric/20 border border-cyan-electric text-cyan-electric font-display font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 hover:bg-cyan-electric/30 hover:shadow-cyan-glow-sm transition-all"
-          >
-            <Play className="w-3.5 h-3.5 fill-current" />
-            <span>Launch Web Tool</span>
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                soundEngine.playLaserShoot();
+                if (onLaunch) onLaunch(product);
+              }}
+              className="flex-1 py-2 px-3 rounded-xl bg-cyan-electric/20 border border-cyan-electric text-cyan-electric font-display font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 hover:bg-cyan-electric/30 hover:shadow-cyan-glow-sm transition-all"
+            >
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>{downloadFile ? 'Launch' : 'Launch Web Tool'}</span>
+            </button>
+
+            {downloadFile && (
+              <a
+                href={downloadFile.fileUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  soundEngine.playLaserShoot();
+                }}
+                className="py-2 px-3 rounded-xl bg-pink-accent/15 border border-pink-accent/50 text-pink-accent font-display font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 hover:bg-pink-accent/25 hover:shadow-pink-glow transition-all"
+                title={`Download ${product.name}`}
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download</span>
+              </a>
+            )}
+          </>
         ) : (
           <button
             type="button"

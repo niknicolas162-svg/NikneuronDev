@@ -116,14 +116,32 @@ export const ListViewFallback: React.FC<ListViewFallbackProps> = ({
                       {/* Accessible Action Links */}
                       <div className="flex items-center gap-2 shrink-0">
                         {product.runnerRoute ? (
-                          <button
-                            type="button"
-                            onClick={() => onLaunchTool(product)}
-                            className="px-4 py-2 rounded-xl bg-cyan-electric/20 border border-cyan-electric text-cyan-electric font-display font-semibold text-xs uppercase tracking-wider flex items-center gap-2 hover:bg-cyan-electric/30 transition-all cursor-pointer"
-                          >
-                            <Play className="w-3.5 h-3.5 fill-current" />
-                            <span>Launch Web Tool</span>
-                          </button>
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => onLaunchTool(product)}
+                              className="px-4 py-2 rounded-xl bg-cyan-electric/20 border border-cyan-electric text-cyan-electric font-display font-semibold text-xs uppercase tracking-wider flex items-center gap-2 hover:bg-cyan-electric/30 transition-all cursor-pointer"
+                            >
+                              <Play className="w-3.5 h-3.5 fill-current" />
+                              <span>Launch Web Tool</span>
+                            </button>
+                            {(() => {
+                              const latestRelease = product.releases.find((r) => r.isLatest) || product.releases[0];
+                              const downloadFile = latestRelease?.files.find((f) => f.fileUrl && !f.fileUrl.startsWith('#'));
+                              if (!downloadFile) return null;
+                              return (
+                                <a
+                                  href={downloadFile.fileUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="px-4 py-2 rounded-xl bg-pink-accent/15 border border-pink-accent/50 text-pink-accent font-display font-semibold text-xs uppercase tracking-wider flex items-center gap-2 hover:bg-pink-accent/25 transition-all cursor-pointer"
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                  <span>Download</span>
+                                </a>
+                              );
+                            })()}
+                          </>
                         ) : (
                           <button
                             type="button"
