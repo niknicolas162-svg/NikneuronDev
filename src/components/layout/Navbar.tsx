@@ -75,11 +75,11 @@ export const Navbar: React.FC<{ activeRoute: string; onNavigate: (route: string)
             }}
             className="flex items-center gap-3 cursor-pointer group"
           >
-            <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-cyan-electric/60 shadow-[0_0_16px_rgba(255,179,0,0.3)] group-hover:border-cyan-electric group-hover:shadow-[0_0_22px_rgba(255,179,0,0.55)] group-hover:scale-105 transition-all duration-300 bg-black p-0.5 shrink-0">
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-cyan-electric/70 shadow-[0_0_16px_rgba(255,179,0,0.35)] group-hover:border-cyan-electric group-hover:shadow-[0_0_24px_rgba(255,179,0,0.6)] group-hover:scale-105 transition-all duration-300 bg-gradient-to-br from-zinc-100 via-white to-amber-50 p-1 shrink-0">
               <img
-                src="/nikneuron-logo.jpg"
+                src="/nikneuron-logo.png"
                 alt="Nikneuron Logo"
-                className="w-full h-full object-contain rounded-lg"
+                className="w-full h-full object-contain"
               />
             </div>
             <div className="flex flex-col">
