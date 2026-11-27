@@ -76,11 +76,11 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const env = (import.meta as unknown as { env?: Record<string, string> }).env;
-    const ownerUser = env?.VITE_OWNER_USERNAME || 'aditya';
-    const ownerKey = env?.VITE_OWNER_KEY || 'nikneuron2026';
+    const ownerUser = env?.VITE_OWNER_USERNAME || 'Nik';
+    const ownerKey = env?.VITE_OWNER_KEY || '753951';
     const normalizedUser = username.trim().toLowerCase();
 
-    if ((normalizedUser === ownerUser.toLowerCase() || normalizedUser === 'nikneuron') && password === ownerKey) {
+    if (normalizedUser === ownerUser.toLowerCase() && password === ownerKey) {
       soundEngine.playLaserShoot();
       setAdminLoggedIn(true);
       setLoginError(false);
