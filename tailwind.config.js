@@ -5,10 +5,10 @@ export default {
     extend: {
       colors: {
         void: {
-          deep: '#09090b',
-          DEFAULT: '#0d0d11',
-          surface: 'rgba(24, 24, 30, 0.58)',
-          hover: 'rgba(36, 36, 46, 0.78)',
+          deep: '#0c0f1d',
+          DEFAULT: '#121629',
+          surface: 'rgba(24, 30, 56, 0.58)',
+          hover: 'rgba(34, 42, 76, 0.78)',
         },
         cyan: {
           electric: '#ffb300',
