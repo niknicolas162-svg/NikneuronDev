@@ -3,6 +3,7 @@ import { Play, Download, ExternalLink, ShieldCheck, Terminal, Cpu, Globe, Smartp
 import { Product } from '../../data/catalog';
 import { GradientSkewCard } from '../ui/GradientSkewCard';
 import { soundEngine } from '../../lib/audio';
+import { trackDownload } from '../../lib/analytics';
 
 interface ProductCardProps {
   product: Product;
@@ -120,6 +121,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   soundEngine.playLaserShoot();
+                  trackDownload(product.slug, downloadFile.fileName);
                 }}
                 className="py-2 px-3 rounded-xl bg-pink-accent/15 border border-pink-accent/50 text-pink-accent font-display font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 hover:bg-pink-accent/25 hover:shadow-pink-glow transition-all"
                 title={`Download ${product.name}`}

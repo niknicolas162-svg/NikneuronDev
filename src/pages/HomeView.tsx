@@ -33,6 +33,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
   const activeCategory = CUBE_CATEGORIES[frontFaceIndex] || CUBE_CATEGORIES[0];
   const featuredProducts = INITIAL_PRODUCTS.filter((p) => p.featured);
   const categoryProducts = INITIAL_PRODUCTS.filter((p) => p.category === activeCategory.slug);
+  const filecoreProduct = INITIAL_PRODUCTS.find((p) => p.slug === 'filecore');
+  const filecoreDownloadUrl = filecoreProduct?.releases[0]?.files[0]?.fileUrl;
 
   const handleSelectProduct = (product: Product) => {
     onNavigate('app-detail', product.slug);
@@ -50,28 +52,86 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
   return (
     <div className="relative w-full pt-20 pb-24 space-y-16">
       {/* Hero Section */}
-      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-8 sm:pt-12">
-        {/* Futuristic Status Pill */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-void-surface/90 border border-cyan-electric/40 mb-6 backdrop-blur-xl shadow-cyan-glow-sm animate-fadeIn">
-          <span className="w-2 h-2 rounded-full bg-pink-accent animate-ping" />
-          <span className="text-[11px] font-mono tracking-widest text-cyan-electric uppercase font-bold">
-            NIKNEURON DEV // LIVE PROTOCOL
-          </span>
-          <span className="text-[10px] font-mono text-text-dim">|</span>
-          <span className="text-[10px] font-mono text-text-secondary">
-            CYBER-FUTURIST SOFTWARE LIBRARY
-          </span>
+      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-10 sm:pt-14">
+        {/* Ambient Hero Aura */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[540px] h-[280px] bg-gradient-to-r from-cyan-electric/15 via-blue-electric/15 to-pink-accent/15 blur-3xl rounded-full pointer-events-none" />
+
+        {/* Brand Emblem + Futuristic Status Pill */}
+        <div className="relative z-10 flex flex-col items-center gap-4 mb-6 animate-fadeIn">
+          <div className="relative group">
+            <div className="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-cyan-electric via-blue-electric to-pink-accent opacity-45 blur-md group-hover:opacity-75 transition-opacity duration-500" />
+            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-cyan-electric/60 bg-void-deep shadow-2xl">
+              <img
+                src="/nikneuron-logo.png"
+                alt="Nikneuron Official Emblem"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-void-surface/90 border border-cyan-electric/40 backdrop-blur-xl shadow-cyan-glow-sm">
+            <span className="w-2 h-2 rounded-full bg-pink-accent animate-ping" />
+            <span className="text-[11px] font-mono tracking-widest text-cyan-electric uppercase font-bold">
+              NIKNEURON DEV // LIVE PROTOCOL
+            </span>
+            <span className="text-[10px] font-mono text-text-dim hidden sm:inline">|</span>
+            <span className="text-[10px] font-mono text-text-secondary hidden sm:inline">
+              CYBER-FUTURIST SOFTWARE LIBRARY
+            </span>
+          </div>
         </div>
 
         {/* Main Title with Neon Highlights */}
-        <h1 className="font-display font-extrabold text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.15] max-w-4xl mx-auto mb-6">
+        <h1 className="relative z-10 font-display font-extrabold text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.15] max-w-4xl mx-auto mb-5">
           DEEP VOID <span className="text-cyan-electric text-glow">SOFTWARE</span> &amp;{' '}
           <span className="text-pink-accent">TACTILE</span> TOOLS
         </h1>
 
-        <p className="font-body text-sm sm:text-base text-text-secondary max-w-2xl mx-auto leading-relaxed mb-8">
+        <p className="relative z-10 font-body text-sm sm:text-base text-text-secondary max-w-2xl mx-auto leading-relaxed mb-7">
           The official developer library by <strong className="text-white">Aditya Tamta</strong>. Run client-side WASM utilities in your browser with zero server latency, or download native binaries verified with cryptographic SHA-256 signatures.
         </p>
+
+        {/* Hero Quick Action CTAs */}
+        <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 mb-8">
+          <button
+            type="button"
+            onClick={() => {
+              soundEngine.playLaserShoot();
+              onNavigate('apps');
+            }}
+            className="px-6 py-3 rounded-2xl bg-cyan-electric/20 border border-cyan-electric text-cyan-electric font-display font-bold text-xs uppercase tracking-wider flex items-center gap-2 hover:bg-cyan-electric/30 hover:shadow-cyan-glow-sm transition-all cursor-pointer"
+          >
+            <Terminal className="w-4 h-4" />
+            <span>Explore Catalog</span>
+          </button>
+
+          {filecoreProduct && (
+            <button
+              type="button"
+              onClick={() => {
+                soundEngine.playLaserShoot();
+                handleLaunchProduct(filecoreProduct);
+              }}
+              className="px-6 py-3 rounded-2xl bg-void-surface/80 border border-white/20 text-white font-display font-bold text-xs uppercase tracking-wider flex items-center gap-2 hover:border-cyan-electric/60 hover:text-cyan-electric transition-all cursor-pointer"
+            >
+              <Play className="w-4 h-4 fill-current text-cyan-electric" />
+              <span>Run FileCore</span>
+            </button>
+          )}
+
+          {filecoreDownloadUrl && !filecoreDownloadUrl.startsWith('#') && (
+            <a
+              href={filecoreDownloadUrl}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => soundEngine.playLaserShoot()}
+              className="px-6 py-3 rounded-2xl bg-pink-accent/20 border border-pink-accent/60 text-pink-accent font-display font-bold text-xs uppercase tracking-wider flex items-center gap-2 hover:bg-pink-accent/30 hover:shadow-pink-glow transition-all cursor-pointer"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download FileCore</span>
+            </a>
+          )}
+        </div>
 
         {/* 3D Energy Cube or 2D List Mode */}
         {viewMode === 'cube' ? (

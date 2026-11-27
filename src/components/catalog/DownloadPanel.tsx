@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Download, Copy, Check, Terminal, Shield, AlertTriangle, FileCode } from 'lucide-react';
 import { Product, ReleaseFile, Release } from '../../data/catalog';
 import { soundEngine } from '../../lib/audio';
+import { trackDownload } from '../../lib/analytics';
 
 interface DownloadPanelProps {
   product: Product;
@@ -52,6 +53,7 @@ export const DownloadPanel: React.FC<DownloadPanelProps> = ({ product }) => {
 
   const handleDownloadClick = (file: ReleaseFile) => {
     soundEngine.playLaserShoot();
+    trackDownload(product.slug, file.fileName);
     setDownloadSuccessId(file.id);
     setTimeout(() => setDownloadSuccessId(null), 3000);
 

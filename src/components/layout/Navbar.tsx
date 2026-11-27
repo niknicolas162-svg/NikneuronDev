@@ -10,7 +10,6 @@ import {
   Download,
   BookOpen,
   Info,
-  ShieldCheck,
 } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { soundEngine } from '../../lib/audio';
@@ -46,7 +45,6 @@ export const Navbar: React.FC<{ activeRoute: string; onNavigate: (route: string)
     { label: 'Changelog', route: 'changelog', icon: Sparkles },
     { label: 'Docs', route: 'docs', icon: BookOpen },
     { label: 'About', route: 'about', icon: Info },
-    { label: 'Admin', route: 'admin', icon: ShieldCheck },
   ];
 
   return (
@@ -77,9 +75,12 @@ export const Navbar: React.FC<{ activeRoute: string; onNavigate: (route: string)
             }}
             className="flex items-center gap-3 cursor-pointer group"
           >
-            <div className="relative w-8 h-8 rounded-lg bg-void-surface border border-cyan-electric/40 flex items-center justify-center transition-all duration-300 group-hover:border-cyan-electric group-hover:shadow-cyan-glow-sm">
-              <span className="w-2.5 h-2.5 rounded-full bg-pink-accent animate-ping absolute" />
-              <span className="w-2.5 h-2.5 rounded-full bg-cyan-electric relative z-10" />
+            <div className="relative w-10 h-10 rounded-full overflow-hidden border border-cyan-electric/50 shadow-[0_0_16px_rgba(79,216,255,0.28)] group-hover:border-cyan-electric group-hover:shadow-[0_0_22px_rgba(79,216,255,0.55)] group-hover:scale-105 transition-all duration-300 bg-void-deep shrink-0">
+              <img
+                src="/nikneuron-logo.png"
+                alt="Nikneuron Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-display font-bold text-sm tracking-wider text-text-primary group-hover:text-cyan-electric transition-colors">
@@ -163,6 +164,32 @@ export const Navbar: React.FC<{ activeRoute: string; onNavigate: (route: string)
                 <Volume2 className="w-4 h-4 text-cyan-electric animate-pulse" />
               )}
             </button>
+          </div>
+        </div>
+
+        {/* Mobile Quick Nav Strip */}
+        <div className="md:hidden border-t border-white/5 bg-void-deep/75 backdrop-blur-md">
+          <div className="max-w-7xl mx-auto px-3 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            {navItems.map((item) => {
+              const active = activeRoute === item.route;
+              return (
+                <button
+                  key={item.route}
+                  onClick={() => {
+                    soundEngine.playTone(650, 0.05, 'sine', 0.04);
+                    onNavigate(item.route);
+                  }}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-mono whitespace-nowrap transition-all flex items-center gap-1 shrink-0 ${
+                    active
+                      ? 'bg-cyan-electric/20 text-cyan-electric font-semibold border border-cyan-electric/50'
+                      : 'text-text-secondary hover:text-white bg-white/5'
+                  }`}
+                >
+                  <item.icon className="w-3 h-3" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </header>

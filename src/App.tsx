@@ -18,6 +18,7 @@ import { AdminDashboardView } from './pages/AdminDashboardView';
 import { INITIAL_PRODUCTS, Product } from './data/catalog';
 import { useAppStore } from './store/useAppStore';
 import { soundEngine } from './lib/audio';
+import { trackPageView, trackToolLaunch } from './lib/analytics';
 
 export const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<string>('home');
@@ -25,12 +26,46 @@ export const App: React.FC = () => {
 
   const selectedProduct = INITIAL_PRODUCTS.find((p) => p.slug === selectedProductSlug) || INITIAL_PRODUCTS[0];
 
+  useEffect(() => {
+    const checkOwnerRoute = () => {
+      if (window.location.hash === '#owner-portal' || new URLSearchParams(window.location.search).get('portal') === 'owner') {
+        setCurrentRoute('admin');
+        return true;
+      }
+      return false;
+    };
+
+    if (!checkOwnerRoute()) {
+      trackPageView('home');
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        setCurrentRoute('admin');
+      }
+    };
+
+    window.addEventListener('hashchange', checkOwnerRoute);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('hashchange', checkOwnerRoute);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   const handleNavigate = (route: string, param?: string) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (param) {
       setSelectedProductSlug(param);
     }
     setCurrentRoute(route);
+    if (route !== 'admin') {
+      trackPageView(route, param);
+    }
+    if (route === 'run' && param) {
+      trackToolLaunch(param);
+    }
   };
 
   return (
@@ -91,8 +126,12 @@ export const App: React.FC = () => {
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/10 bg-void-deep/90 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-text-dim">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-electric" />
+          <div className="flex items-center gap-2.5">
+            <img
+              src="/nikneuron-logo.png"
+              alt="Nikneuron"
+              className="w-6 h-6 rounded-full border border-cyan-electric/40 object-cover"
+            />
             <span className="text-white font-display font-semibold">NIKNEURON DEV</span>
             <span>— Architecture by Aditya Tamta</span>
           </div>
@@ -108,12 +147,6 @@ export const App: React.FC = () => {
               className="hover:text-pink-accent transition-colors"
             >
               Checksums
-            </button>
-            <button
-              onClick={() => handleNavigate('admin')}
-              className="hover:text-white transition-colors"
-            >
-              Admin
             </button>
             <a
               href="mailto:nikneuronofficial@gmail.com"

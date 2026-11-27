@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { INITIAL_PRODUCTS, Product, ReleaseFile } from '../data/catalog';
 import { soundEngine } from '../lib/audio';
+import { trackDownload } from '../lib/analytics';
 
 interface FlatDownloadItem {
   product: Product;
@@ -79,6 +80,7 @@ export const DownloadsView: React.FC<{ onSelectProduct: (product: Product) => vo
 
   const triggerDownload = (item: FlatDownloadItem) => {
     soundEngine.playLaserShoot();
+    trackDownload(item.product.slug, item.file.fileName);
     setDownloadingId(item.file.id);
     setTimeout(() => setDownloadingId(null), 3000);
     if (item.file.fileUrl && !item.file.fileUrl.startsWith('#')) {

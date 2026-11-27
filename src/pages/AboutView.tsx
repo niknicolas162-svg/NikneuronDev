@@ -29,8 +29,12 @@ export const AboutView: React.FC = () => {
       <div className="glass-surface-tier-1 p-8 sm:p-10 rounded-3xl border border-white/15 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-white/10 pb-6">
           <div className="flex items-center gap-4">
-            <div className="relative w-16 h-16 rounded-2xl bg-void-surface border-2 border-cyan-electric/50 flex items-center justify-center overflow-hidden shadow-cyan-glow-sm">
-              <span className="font-display font-extrabold text-xl text-white">AT</span>
+            <div className="relative w-16 h-16 rounded-full bg-void-surface border-2 border-cyan-electric/60 flex items-center justify-center overflow-hidden shadow-cyan-glow-sm">
+              <img
+                src="/nikneuron-logo.png"
+                alt="Nikneuron Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
               <h2 className="font-display font-bold text-lg text-white">

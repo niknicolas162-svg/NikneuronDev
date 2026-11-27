@@ -20,6 +20,7 @@ import { GithubIcon } from '../components/ui/GithubIcon';
 import { Product } from '../data/catalog';
 import { DownloadPanel } from '../components/catalog/DownloadPanel';
 import { soundEngine } from '../lib/audio';
+import { trackDownload } from '../lib/analytics';
 
 interface ProductDetailViewProps {
   product: Product;
@@ -164,7 +165,10 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
                   href={downloadFile.fileUrl}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => soundEngine.playLaserShoot()}
+                  onClick={() => {
+                    soundEngine.playLaserShoot();
+                    trackDownload(product.slug, downloadFile.fileName);
+                  }}
                   className="py-3 px-6 rounded-2xl bg-pink-accent/20 border border-pink-accent/60 text-pink-accent font-display font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-pink-accent/30 hover:shadow-pink-glow transition-all cursor-pointer"
                 >
                   <Download className="w-4 h-4" />

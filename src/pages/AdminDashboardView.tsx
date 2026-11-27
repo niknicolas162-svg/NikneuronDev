@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ShieldCheck,
   Plus,
@@ -11,10 +11,24 @@ import {
   Trash2,
   Eye,
   FileCheck,
+  Activity,
+  Users,
+  Download,
+  Play,
+  Monitor,
+  Smartphone,
+  Globe,
+  RefreshCw,
 } from 'lucide-react';
 import { INITIAL_PRODUCTS, Product, ReleaseFile } from '../data/catalog';
 import { CUBE_CATEGORIES, useAppStore } from '../store/useAppStore';
 import { soundEngine } from '../lib/audio';
+import {
+  getTrafficData,
+  subscribeTrafficUpdates,
+  clearTrafficData,
+  TrafficStore,
+} from '../lib/analytics';
 
 export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: string) => void }> = ({
   onNavigate,
@@ -27,6 +41,15 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
 
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'traffic' | 'catalog'>('traffic');
+  const [traffic, setTraffic] = useState<TrafficStore>(() => getTrafficData());
+
+  useEffect(() => {
+    setTraffic(getTrafficData());
+    return subscribeTrafficUpdates((updated) => {
+      setTraffic({ ...updated });
+    });
+  }, []);
 
   // New product form state
   const [formData, setFormData] = useState({
@@ -51,8 +74,9 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Default owner key
-    if (password === 'nikneuron2026' || password === 'admin' || password === 'aditya') {
+    const envKey = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_OWNER_KEY;
+    const ownerKey = envKey || 'nikneuron2026';
+    if (password === ownerKey) {
       soundEngine.playLaserShoot();
       setAdminLoggedIn(true);
       setLoginError(false);
@@ -162,7 +186,7 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter admin passcode (e.g. aditya)"
+                placeholder="Enter owner access key"
                 className="w-full bg-black/60 border border-white/20 rounded-xl px-4 py-2.5 text-xs text-white placeholder-text-dim focus:outline-none focus:border-cyan-electric text-center font-mono"
               />
               {loginError && (
@@ -179,10 +203,6 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
               Authenticate &amp; Enter
             </button>
           </form>
-
-          <p className="text-[10px] font-mono text-text-dim">
-            Demo Passcode: <code className="text-cyan-electric">aditya</code> or <code className="text-cyan-electric">admin</code>
-          </p>
         </div>
       </div>
     );
@@ -204,7 +224,40 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
           </h1>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center bg-void-surface/80 border border-white/10 rounded-xl p-1">
+            <button
+              type="button"
+              onClick={() => {
+                soundEngine.playTone(700, 0.04, 'sine', 0.04);
+                setActiveTab('traffic');
+              }}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeTab === 'traffic'
+                  ? 'bg-cyan-electric/20 text-cyan-electric border border-cyan-electric/40 font-semibold'
+                  : 'text-text-dim hover:text-white'
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5" />
+              <span>Traffic &amp; Visitors</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                soundEngine.playTone(700, 0.04, 'sine', 0.04);
+                setActiveTab('catalog');
+              }}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeTab === 'catalog'
+                  ? 'bg-pink-accent/20 text-pink-accent border border-pink-accent/40 font-semibold'
+                  : 'text-text-dim hover:text-white'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Catalog ({products.length})</span>
+            </button>
+          </div>
+
           <button
             onClick={() => setShowAddModal(true)}
             className="px-4 py-2 rounded-xl bg-cyan-electric text-black font-display font-bold text-xs uppercase tracking-wider flex items-center gap-2 hover:bg-cyan-electric/90 transition-all cursor-pointer shadow-cyan-glow-sm"
@@ -215,14 +268,328 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
 
           <button
             onClick={() => setAdminLoggedIn(false)}
-            className="px-3 py-2 rounded-xl bg-void-surface border border-white/10 text-xs font-mono text-text-dim hover:text-white"
+            className="px-3 py-2 rounded-xl bg-void-surface border border-white/10 text-xs font-mono text-text-dim hover:text-white cursor-pointer"
           >
             Logout
           </button>
         </div>
       </div>
 
+      {/* Traffic & Visitors Analytics Tab */}
+      {activeTab === 'traffic' && (() => {
+        const todayKey = new Date().toISOString().split('T')[0];
+        const todayStats = traffic.daily[todayKey] || { date: todayKey, views: 0, downloads: 0, launches: 0 };
+
+        // Build last 7 days series
+        const last7Days = Array.from({ length: 7 }, (_, idx) => {
+          const d = new Date();
+          d.setDate(d.getDate() - (6 - idx));
+          const key = d.toISOString().split('T')[0];
+          const dayData = traffic.daily[key] || { date: key, views: 0, downloads: 0, launches: 0 };
+          return {
+            key,
+            label: d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' }),
+            ...dayData,
+          };
+        });
+        const maxDailyViews = Math.max(1, ...last7Days.map((d) => d.views));
+
+        const topRoutes = Object.entries(traffic.routeCounts).sort((a, b) => b[1] - a[1]);
+        const maxRouteCount = Math.max(1, ...topRoutes.map(([, c]) => c));
+
+        const topProducts = Object.entries(traffic.productViews).sort((a, b) => b[1] - a[1]);
+        const topDownloads = Object.entries(traffic.productDownloads).sort((a, b) => b[1] - a[1]);
+        const osEntries = Object.entries(traffic.osCounts).sort((a, b) => b[1] - a[1]);
+        const deviceEntries = Object.entries(traffic.deviceCounts).sort((a, b) => b[1] - a[1]);
+
+        const handleExportJson = () => {
+          soundEngine.playTone(850, 0.05, 'triangle', 0.04);
+          const blob = new Blob([JSON.stringify(traffic, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `nikneuron-traffic-${todayKey}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+        };
+
+        return (
+          <div className="space-y-6 animate-fadeIn">
+            {/* 4 KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="glass-surface-tier-2 p-5 rounded-2xl border border-cyan-electric/30">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-text-dim">Total Page Views</span>
+                  <Eye className="w-4 h-4 text-cyan-electric" />
+                </div>
+                <div className="font-display font-extrabold text-2xl text-white">
+                  {traffic.totalViews.toLocaleString()}
+                </div>
+                <div className="text-[11px] font-mono text-cyan-electric mt-1">
+                  +{todayStats.views} today
+                </div>
+              </div>
+
+              <div className="glass-surface-tier-2 p-5 rounded-2xl border border-pink-accent/30">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-text-dim">Unique Visitors</span>
+                  <Users className="w-4 h-4 text-pink-accent" />
+                </div>
+                <div className="font-display font-extrabold text-2xl text-white">
+                  {traffic.uniqueVisitors.length.toLocaleString()}
+                </div>
+                <div className="text-[11px] font-mono text-pink-accent mt-1">
+                  Tracked browser sessions
+                </div>
+              </div>
+
+              <div className="glass-surface-tier-2 p-5 rounded-2xl border border-green-400/30">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-text-dim">Web Tool Launches</span>
+                  <Play className="w-4 h-4 text-green-400" />
+                </div>
+                <div className="font-display font-extrabold text-2xl text-white">
+                  {traffic.totalLaunches.toLocaleString()}
+                </div>
+                <div className="text-[11px] font-mono text-green-400 mt-1">
+                  +{todayStats.launches} today
+                </div>
+              </div>
+
+              <div className="glass-surface-tier-2 p-5 rounded-2xl border border-amber-400/30">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-text-dim">App Downloads</span>
+                  <Download className="w-4 h-4 text-amber-400" />
+                </div>
+                <div className="font-display font-extrabold text-2xl text-white">
+                  {traffic.totalDownloads.toLocaleString()}
+                </div>
+                <div className="text-[11px] font-mono text-amber-400 mt-1">
+                  +{todayStats.downloads} today
+                </div>
+              </div>
+            </div>
+
+            {/* 7-Day Traffic Chart & Top Pages */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 glass-surface-tier-2 p-6 rounded-2xl border border-white/10 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-display font-bold text-sm text-white">7-Day Traffic Pulse</h3>
+                    <p className="text-[11px] font-mono text-text-dim">Page views, tool launches, and downloads</p>
+                  </div>
+                  <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-cyan-electric/15 text-cyan-electric border border-cyan-electric/30 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-electric animate-ping" />
+                    LIVE TELEMETRY
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-7 gap-2 sm:gap-3 items-end h-44 pt-4 border-t border-white/5">
+                  {last7Days.map((day) => {
+                    const heightPct = Math.max(6, Math.round((day.views / maxDailyViews) * 100));
+                    return (
+                      <div key={day.key} className="flex flex-col items-center h-full justify-end gap-2 group">
+                        <span className="text-[10px] font-mono text-cyan-electric opacity-80 group-hover:opacity-100">
+                          {day.views}
+                        </span>
+                        <div className="w-full max-w-[36px] bg-white/5 rounded-t-lg overflow-hidden flex items-end h-28 border border-white/10">
+                          <div
+                            className="w-full bg-gradient-to-t from-cyan-electric/60 via-cyan-electric to-pink-accent transition-all duration-500 rounded-t-md"
+                            style={{ height: `${heightPct}%` }}
+                            title={`${day.label}: ${day.views} views, ${day.launches} launches, ${day.downloads} downloads`}
+                          />
+                        </div>
+                        <span className="text-[9px] font-mono text-text-dim text-center truncate w-full">
+                          {day.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Top Pages */}
+              <div className="glass-surface-tier-2 p-6 rounded-2xl border border-white/10 space-y-4">
+                <h3 className="font-display font-bold text-sm text-white">Top Checked Sections</h3>
+                <div className="space-y-3">
+                  {topRoutes.length === 0 ? (
+                    <p className="text-xs font-mono text-text-dim">No route visits recorded yet.</p>
+                  ) : (
+                    topRoutes.slice(0, 6).map(([route, count]) => (
+                      <div key={route} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <span className="text-white uppercase">/{route}</span>
+                          <span className="text-cyan-electric font-bold">{count}</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-cyan-electric to-pink-accent rounded-full"
+                            style={{ width: `${Math.round((count / maxRouteCount) * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Product Views, Downloads & Environment Breakdown */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="glass-surface-tier-2 p-5 rounded-2xl border border-white/10 space-y-3">
+                <h3 className="font-display font-bold text-xs uppercase tracking-wider text-cyan-electric">
+                  Most Checked Apps
+                </h3>
+                {topProducts.length === 0 ? (
+                  <p className="text-xs font-mono text-text-dim">Visit an app detail or runner to track.</p>
+                ) : (
+                  <ul className="space-y-2 text-xs font-mono">
+                    {topProducts.slice(0, 5).map(([slug, count]) => (
+                      <li key={slug} className="flex items-center justify-between py-1 border-b border-white/5">
+                        <span className="text-white truncate">{slug}</span>
+                        <span className="text-cyan-electric">{count} checks</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="glass-surface-tier-2 p-5 rounded-2xl border border-white/10 space-y-3">
+                <h3 className="font-display font-bold text-xs uppercase tracking-wider text-pink-accent">
+                  Download Clicks
+                </h3>
+                {topDownloads.length === 0 ? (
+                  <p className="text-xs font-mono text-text-dim">No download clicks recorded yet.</p>
+                ) : (
+                  <ul className="space-y-2 text-xs font-mono">
+                    {topDownloads.slice(0, 5).map(([target, count]) => (
+                      <li key={target} className="flex items-center justify-between py-1 border-b border-white/5 gap-2">
+                        <span className="text-white truncate">{target}</span>
+                        <span className="text-pink-accent shrink-0">{count}x</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="glass-surface-tier-2 p-5 rounded-2xl border border-white/10 space-y-3">
+                <h3 className="font-display font-bold text-xs uppercase tracking-wider text-amber-400">
+                  Devices &amp; Platforms
+                </h3>
+                <div className="space-y-2 text-xs font-mono">
+                  <div className="flex flex-wrap gap-2">
+                    {deviceEntries.map(([dev, count]) => (
+                      <span
+                        key={dev}
+                        className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white flex items-center gap-1.5"
+                      >
+                        {dev === 'Mobile' ? <Smartphone className="w-3 h-3 text-pink-accent" /> : <Monitor className="w-3 h-3 text-cyan-electric" />}
+                        {dev}: {count}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {osEntries.map(([os, count]) => (
+                      <span
+                        key={os}
+                        className="px-2 py-0.5 rounded bg-void-surface border border-white/10 text-[10px] text-text-secondary"
+                      >
+                        {os} ({count})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Visitor Activity Feed */}
+            <div className="glass-surface-tier-2 rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+              <div className="p-4 sm:p-5 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-void-surface/60">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-cyan-electric" />
+                  <h3 className="font-display font-bold text-sm text-white">Live Visitor Activity Log</h3>
+                  <span className="text-[10px] font-mono text-text-dim">({traffic.recentEvents.length} recent events)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleExportJson}
+                    className="px-3 py-1.5 rounded-lg bg-cyan-electric/15 border border-cyan-electric/40 text-cyan-electric text-[11px] font-mono hover:bg-cyan-electric/25 transition-all cursor-pointer"
+                  >
+                    Export JSON
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundEngine.playTone(350, 0.08, 'sawtooth', 0.05);
+                      setTraffic(clearTrafficData());
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[11px] font-mono hover:bg-red-500/20 transition-all cursor-pointer flex items-center gap-1"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    <span>Reset</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto max-h-80 overflow-y-auto">
+                <table className="w-full text-left font-mono text-xs">
+                  <thead className="bg-void-deep/80 border-b border-white/10 text-text-dim text-[10px] uppercase tracking-wider sticky top-0">
+                    <tr>
+                      <th className="p-3">Event</th>
+                      <th className="p-3">Route / Target</th>
+                      <th className="p-3">Visitor</th>
+                      <th className="p-3">Environment</th>
+                      <th className="p-3 text-right">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {traffic.recentEvents.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="p-6 text-center text-text-dim">
+                          No visitor activity recorded yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      traffic.recentEvents.map((evt) => (
+                        <tr key={evt.id} className="hover:bg-white/5 transition-colors">
+                          <td className="p-3">
+                            <span
+                              className={`text-[10px] px-2 py-0.5 rounded-full uppercase font-semibold border ${
+                                evt.type === 'download'
+                                  ? 'bg-pink-accent/15 text-pink-accent border-pink-accent/40'
+                                  : evt.type === 'launch'
+                                  ? 'bg-green-500/15 text-green-400 border-green-500/40'
+                                  : 'bg-cyan-electric/15 text-cyan-electric border-cyan-electric/40'
+                              }`}
+                            >
+                              {evt.type}
+                            </span>
+                          </td>
+                          <td className="p-3 text-white">
+                            /{evt.route}
+                            {evt.target ? <span className="text-cyan-electric ml-1.5">→ {evt.target}</span> : null}
+                          </td>
+                          <td className="p-3 text-text-dim text-[11px]">{evt.visitorId.slice(0, 12)}</td>
+                          <td className="p-3 text-text-secondary text-[11px]">
+                            {evt.device} · {evt.os} · {evt.browser}
+                          </td>
+                          <td className="p-3 text-right text-text-dim text-[11px]">
+                            {new Date(evt.timestamp).toLocaleTimeString()}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Catalog Admin List */}
+      {activeTab === 'catalog' && (
       <div className="glass-surface-tier-2 rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left font-mono text-xs">
@@ -281,6 +648,7 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
           </table>
         </div>
       </div>
+      )}
 
       {/* Add Product Modal */}
       {showAddModal && (
