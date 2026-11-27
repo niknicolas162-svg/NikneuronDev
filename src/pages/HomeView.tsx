@@ -59,12 +59,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         {/* Brand Emblem + Futuristic Status Pill */}
         <div className="relative z-10 flex flex-col items-center gap-4 mb-6 animate-fadeIn">
           <div className="relative group">
-            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-cyan-electric via-pink-accent to-white opacity-45 blur-md group-hover:opacity-75 transition-opacity duration-500" />
-            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-cyan-electric/80 bg-gradient-to-br from-zinc-100 via-white to-amber-50 p-2 shadow-[0_0_35px_rgba(255,179,0,0.35)]">
+            <div className="absolute -inset-2 rounded-full bg-gradient-to-tr from-cyan-electric via-pink-accent to-white opacity-45 blur-md group-hover:opacity-75 transition-opacity duration-500" />
+            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-cyan-electric/80 shadow-[0_0_35px_rgba(255,179,0,0.35)]">
               <img
                 src="/nikneuron-logo.png"
                 alt="Nikneuron Official Emblem"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
