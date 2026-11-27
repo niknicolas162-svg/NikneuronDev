@@ -87,7 +87,7 @@ export const AsmrBackground: React.FC = () => {
         if (rand < 0.25) {
           // Galactic Core
           layer = 'core';
-          color = Math.random() > 0.4 ? '#e8fbff' : '#4fd8ff';
+          color = Math.random() > 0.4 ? '#fff8e7' : '#ffb300';
           const r = Math.random() * Math.min(width, height) * 0.18;
           const theta = Math.random() * Math.PI * 2;
           originX = centerX + Math.cos(theta) * r;
@@ -103,12 +103,12 @@ export const AsmrBackground: React.FC = () => {
           spiralAngle = arm * Math.PI + Math.log(spiralDist + 10) * 1.8 + (Math.random() - 0.5) * 0.5;
           originX = centerX + Math.cos(spiralAngle) * spiralDist;
           originY = centerY + Math.sin(spiralAngle) * spiralDist;
-          color = Math.random() > 0.7 ? '#ff5aa5' : Math.random() > 0.4 ? '#4fd8ff' : '#2979ff';
+          color = Math.random() > 0.7 ? '#ff6b00' : Math.random() > 0.4 ? '#ffb300' : '#e2e8f0';
           baseAlpha = 0.3 + Math.random() * 0.45;
         } else if (rand < 0.8) {
           // Cosmic Dust Lanes
           layer = 'dust';
-          color = '#0a3cff';
+          color = '#78350f';
           originX = Math.random() * width;
           originY = Math.random() * height;
           radius = 1.2 + Math.random() * 2.0;
@@ -236,8 +236,8 @@ export const AsmrBackground: React.FC = () => {
         const tailY = s.y - Math.sin(s.angle) * s.length;
 
         const starGrad = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
-        starGrad.addColorStop(0, 'rgba(79, 216, 255, 0)');
-        starGrad.addColorStop(1, `rgba(232, 251, 255, ${s.alpha})`);
+        starGrad.addColorStop(0, 'rgba(255, 179, 0, 0)');
+        starGrad.addColorStop(1, `rgba(255, 248, 231, ${s.alpha})`);
 
         ctx.strokeStyle = starGrad;
         ctx.lineWidth = 1.6;

@@ -54,8 +54,8 @@ export const Navbar: React.FC<{ activeRoute: string; onNavigate: (route: string)
         className="fixed top-0 left-0 h-[2.5px] z-50 transition-all duration-75 pointer-events-none"
         style={{
           width: `${scrollProgress}%`,
-          background: 'linear-gradient(90deg, #4fd8ff 0%, #ff5aa5 50%, #4fd8ff 100%)',
-          boxShadow: '0 0 10px rgba(79, 216, 255, 0.7)',
+          background: 'linear-gradient(90deg, #ffb300 0%, #ff6b00 50%, #ffb300 100%)',
+          boxShadow: '0 0 10px rgba(255, 179, 0, 0.7)',
         }}
       />
 
@@ -75,11 +75,11 @@ export const Navbar: React.FC<{ activeRoute: string; onNavigate: (route: string)
             }}
             className="flex items-center gap-3 cursor-pointer group"
           >
-            <div className="relative w-10 h-10 rounded-full overflow-hidden border border-cyan-electric/50 shadow-[0_0_16px_rgba(79,216,255,0.28)] group-hover:border-cyan-electric group-hover:shadow-[0_0_22px_rgba(79,216,255,0.55)] group-hover:scale-105 transition-all duration-300 bg-void-deep shrink-0">
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-cyan-electric/60 shadow-[0_0_16px_rgba(255,179,0,0.3)] group-hover:border-cyan-electric group-hover:shadow-[0_0_22px_rgba(255,179,0,0.55)] group-hover:scale-105 transition-all duration-300 bg-white p-0.5 shrink-0">
               <img
-                src="/nikneuron-logo.png"
+                src="/nikneuron-logo.jpg"
                 alt="Nikneuron Logo"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain rounded-lg"
               />
             </div>
             <div className="flex flex-col">

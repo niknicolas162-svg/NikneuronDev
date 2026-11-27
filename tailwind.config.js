@@ -5,27 +5,27 @@ export default {
     extend: {
       colors: {
         void: {
-          deep: '#020308',
-          DEFAULT: '#050612',
-          surface: 'rgba(10, 20, 50, 0.45)',
-          hover: 'rgba(16, 28, 68, 0.65)',
+          deep: '#09090b',
+          DEFAULT: '#0d0d11',
+          surface: 'rgba(24, 24, 30, 0.58)',
+          hover: 'rgba(36, 36, 46, 0.78)',
         },
         cyan: {
-          electric: '#4fd8ff',
-          subtle: 'rgba(79, 216, 255, 0.12)',
+          electric: '#ffb300',
+          subtle: 'rgba(255, 179, 0, 0.14)',
         },
         pink: {
-          accent: '#ff5aa5',
+          accent: '#ff6b00',
         },
-        ice: '#e8fbff',
+        ice: '#fff8e7',
         blue: {
-          electric: '#2979ff',
-          deep: '#0a3cff',
+          electric: '#e2e8f0',
+          deep: '#78350f',
         },
         text: {
-          primary: '#f1f7ff',
-          secondary: '#b8cae4',
-          dim: '#8ba1c2',
+          primary: '#fafafa',
+          secondary: '#d4d4d8',
+          dim: '#a1a1aa',
         },
       },
       fontFamily: {
@@ -34,13 +34,13 @@ export default {
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       boxShadow: {
-        'cyan-glow': '0 0 30px rgba(79, 216, 255, 0.45)',
-        'cyan-glow-sm': '0 0 15px rgba(79, 216, 255, 0.3)',
-        'pink-glow': '0 0 30px rgba(255, 90, 165, 0.5)',
-        'pink-glow-sm': '0 0 15px rgba(255, 90, 165, 0.35)',
-        glass: '0 10px 30px rgba(0, 0, 0, 0.5)',
-        'glass-hover': '0 18px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(79, 216, 255, 0.2)',
-        'glass-tier-1': '0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(79, 216, 255, 0.15)',
+        'cyan-glow': '0 0 30px rgba(255, 179, 0, 0.45)',
+        'cyan-glow-sm': '0 0 15px rgba(255, 179, 0, 0.3)',
+        'pink-glow': '0 0 30px rgba(255, 107, 0, 0.5)',
+        'pink-glow-sm': '0 0 15px rgba(255, 107, 0, 0.35)',
+        glass: '0 10px 30px rgba(0, 0, 0, 0.55)',
+        'glass-hover': '0 18px 40px rgba(0, 0, 0, 0.75), 0 0 25px rgba(255, 179, 0, 0.22)',
+        'glass-tier-1': '0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(255, 179, 0, 0.16)',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

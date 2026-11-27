@@ -112,9 +112,9 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
   const plasmaUniforms = useMemo(
     () => ({
       uTime: { value: 0 },
-      uColorCore: { value: new THREE.Color('#e8fbff') },
-      uColorRim: { value: new THREE.Color('#4fd8ff') },
-      uColorDeep: { value: new THREE.Color('#0a3cff') },
+      uColorCore: { value: new THREE.Color('#fff8e7') },
+      uColorRim: { value: new THREE.Color('#ffb300') },
+      uColorDeep: { value: new THREE.Color('#78350f') },
     }),
     []
   );
@@ -268,7 +268,7 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
       <mesh ref={latticeMeshRef}>
         <icosahedronGeometry args={[1.1, 1]} />
         <meshBasicMaterial
-          color="#ff5aa5"
+          color="#ff6b00"
           wireframe={true}
           transparent={true}
           opacity={0.8}
@@ -282,7 +282,7 @@ const EnergyCubeGroup: React.FC<EnergyCubeGroupProps> = ({
 
       <lineSegments geometry={edgesGeometry}>
         <lineBasicMaterial
-          color="#4fd8ff"
+          color="#ffb300"
           linewidth={2}
           transparent={true}
           opacity={0.9}
@@ -300,9 +300,9 @@ const SpaceHalo: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (ctx) {
       const grad = ctx.createRadialGradient(128, 128, 10, 128, 128, 128);
-      grad.addColorStop(0, 'rgba(79, 216, 255, 0.45)');
-      grad.addColorStop(0.35, 'rgba(10, 60, 255, 0.22)');
-      grad.addColorStop(0.7, 'rgba(255, 90, 165, 0.08)');
+      grad.addColorStop(0, 'rgba(255, 179, 0, 0.45)');
+      grad.addColorStop(0.35, 'rgba(255, 107, 0, 0.22)');
+      grad.addColorStop(0.7, 'rgba(255, 248, 231, 0.08)');
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 256, 256);

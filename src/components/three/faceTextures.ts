@@ -15,14 +15,14 @@ export function createFaceCanvasTexture(index: number): THREE.CanvasTexture {
   }
 
   const category = CUBE_CATEGORIES[index];
-  const accent = category ? category.accentColor : '#4fd8ff';
+  const accent = category ? category.accentColor : '#ffb300';
 
-  // Base background: translucent deep void glass
-  ctx.fillStyle = 'rgba(5, 6, 18, 0.72)';
+  // Base background: translucent deep obsidian glass
+  ctx.fillStyle = 'rgba(13, 13, 17, 0.78)';
   ctx.fillRect(0, 0, 512, 512);
 
   // Subtle interior grid
-  ctx.strokeStyle = 'rgba(79, 216, 255, 0.08)';
+  ctx.strokeStyle = 'rgba(255, 179, 0, 0.08)';
   ctx.lineWidth = 1;
   const step = 32;
   for (let x = step; x < 512; x += step) {

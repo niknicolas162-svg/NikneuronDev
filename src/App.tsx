@@ -147,9 +147,9 @@ export const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-text-dim">
           <div className="flex items-center gap-2.5">
             <img
-              src="/nikneuron-logo.png"
+              src="/nikneuron-logo.jpg"
               alt="Nikneuron"
-              className="w-6 h-6 rounded-full border border-cyan-electric/40 object-cover"
+              className="w-7 h-7 rounded-lg border border-cyan-electric/50 bg-white p-0.5 object-contain"
             />
             <span className="text-white font-display font-semibold">NIKNEURON DEV</span>
             <span>— Architecture by Aditya Tamta</span>
