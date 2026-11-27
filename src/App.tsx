@@ -28,7 +28,12 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const checkOwnerRoute = () => {
-      if (window.location.hash === '#owner-portal' || new URLSearchParams(window.location.search).get('portal') === 'owner') {
+      const path = window.location.pathname.replace(/\/+$/, '');
+      if (
+        path === '/admin' ||
+        window.location.hash === '#owner-portal' ||
+        new URLSearchParams(window.location.search).get('portal') === 'owner'
+      ) {
         setCurrentRoute('admin');
         return true;
       }
@@ -42,20 +47,34 @@ export const App: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
         e.preventDefault();
+        window.history.pushState(null, '', '/admin');
         setCurrentRoute('admin');
       }
     };
 
+    const handlePopState = () => {
+      if (!checkOwnerRoute()) {
+        setCurrentRoute('home');
+      }
+    };
+
     window.addEventListener('hashchange', checkOwnerRoute);
+    window.addEventListener('popstate', handlePopState);
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('hashchange', checkOwnerRoute);
+      window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
   const handleNavigate = (route: string, param?: string) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.location.pathname === '/admin' && route !== 'admin') {
+      window.history.pushState(null, '', '/');
+    } else if (route === 'admin' && window.location.pathname !== '/admin') {
+      window.history.pushState(null, '', '/admin');
+    }
     if (param) {
       setSelectedProductSlug(param);
     }

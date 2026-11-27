@@ -36,6 +36,7 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
   const adminLoggedIn = useAppStore((s) => s.adminLoggedIn);
   const setAdminLoggedIn = useAppStore((s) => s.setAdminLoggedIn);
 
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
 
@@ -74,9 +75,12 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const envKey = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_OWNER_KEY;
-    const ownerKey = envKey || 'nikneuron2026';
-    if (password === ownerKey) {
+    const env = (import.meta as unknown as { env?: Record<string, string> }).env;
+    const ownerUser = env?.VITE_OWNER_USERNAME || 'aditya';
+    const ownerKey = env?.VITE_OWNER_KEY || 'nikneuron2026';
+    const normalizedUser = username.trim().toLowerCase();
+
+    if ((normalizedUser === ownerUser.toLowerCase() || normalizedUser === 'nikneuron') && password === ownerKey) {
       soundEngine.playLaserShoot();
       setAdminLoggedIn(true);
       setLoginError(false);
@@ -180,18 +184,38 @@ export const AdminDashboardView: React.FC<{ onNavigate: (route: string, param?: 
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4 text-left">
             <div>
+              <label className="text-[10px] font-mono text-text-dim uppercase block mb-1.5 tracking-wider">
+                Owner Username
+              </label>
+              <input
+                type="text"
+                required
+                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter owner username"
+                className="w-full bg-black/60 border border-white/20 rounded-xl px-4 py-2.5 text-xs text-white placeholder-text-dim focus:outline-none focus:border-cyan-electric font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] font-mono text-text-dim uppercase block mb-1.5 tracking-wider">
+                Access Password
+              </label>
               <input
                 type="password"
+                required
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter owner access key"
-                className="w-full bg-black/60 border border-white/20 rounded-xl px-4 py-2.5 text-xs text-white placeholder-text-dim focus:outline-none focus:border-cyan-electric text-center font-mono"
+                placeholder="Enter access password"
+                className="w-full bg-black/60 border border-white/20 rounded-xl px-4 py-2.5 text-xs text-white placeholder-text-dim focus:outline-none focus:border-cyan-electric font-mono"
               />
               {loginError && (
-                <p className="text-[11px] font-mono text-pink-accent mt-1">
-                  Access denied. Invalid credentials.
+                <p className="text-[11px] font-mono text-pink-accent mt-2 text-center">
+                  Access denied. Invalid username or password.
                 </p>
               )}
             </div>
