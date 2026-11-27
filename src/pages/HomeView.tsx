@@ -60,7 +60,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         <div className="relative z-10 flex flex-col items-center gap-4 mb-6 animate-fadeIn">
           <div className="relative group">
             <div className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-cyan-electric via-pink-accent to-white opacity-45 blur-md group-hover:opacity-75 transition-opacity duration-500" />
-            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-cyan-electric/70 bg-white p-1.5 shadow-2xl">
+            <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-cyan-electric/70 bg-black p-1.5 shadow-2xl">
               <img
                 src="/nikneuron-logo.jpg"
                 alt="Nikneuron Official Emblem"

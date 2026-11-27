@@ -149,7 +149,7 @@ export const App: React.FC = () => {
             <img
               src="/nikneuron-logo.jpg"
               alt="Nikneuron"
-              className="w-7 h-7 rounded-lg border border-cyan-electric/50 bg-white p-0.5 object-contain"
+              className="w-7 h-7 rounded-lg border border-cyan-electric/50 bg-black p-0.5 object-contain"
             />
             <span className="text-white font-display font-semibold">NIKNEURON DEV</span>
             <span>— Architecture by Aditya Tamta</span>
